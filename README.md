@@ -9,7 +9,7 @@ You will have to compile tasmota to integrate the file xdrv_92_sip.ino
 First step is to clone tasmota from [github projectpage](https://github.com/arendst/tasmota/)
 
 ## Hardware
-![door bell interface](https://github.com/gkle/tasmota-sip/blob/main/images/klingel.jpg)
+![door bell interface](/images/klingel.jpg)
 
 ## Commands
 - siptest simulate door bell
