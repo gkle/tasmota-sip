@@ -9,6 +9,7 @@ You will have to compile tasmota to integrate the file xdrv_92_sip.ino
 First step is to clone tasmota from [github projectpage](https://github.com/arendst/tasmota/)
 
 ## Hardware
+PIR1 and BMP280 are optional. For U2 i have used a cheep step down converter. Also U3 opto coupler may also be replaced by handy one.
 ![door bell interface](/images/klingel.jpg)
 
 ## Commands
