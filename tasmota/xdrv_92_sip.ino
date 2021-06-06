@@ -366,10 +366,10 @@ void Sip_cmd_set() {
             if (value)
                 strncpy(sipConfig.password, value, sizeof(sipConfig.password));
             ResponseAppend_P(PSTR("pwd %s"), sipConfig.password);
-        } else if (strncmp(XdrvMailbox.data, PSTR("ip %s"), 2)==0) {
+        } else if (strncmp(XdrvMailbox.data, PSTR("ipstr %s"), 2)==0) {
             if (value)
                 strncpy(sipConfig.ipStr, value, sizeof(sipConfig.ipStr));
-            ResponseAppend_P(PSTR("ip %s"), sipConfig.ipStr);
+            ResponseAppend_P(PSTR("ipstr %s"), sipConfig.ipStr);
         } else if (strncmp(XdrvMailbox.data, PSTR("port %d"), 4)==0) {
             if (value)
                 sipConfig.port = atoi(value);
