@@ -32,7 +32,10 @@ There are a limited number of commands you can enter into web console.
   - port 	fritzbox port. Default 5060
 
 ## Configuration
-USE_RULES must be defined to borrow MEM1-MEM5 as config variables. To set enter MEM1 value into web console.
+![IO configuration](/images/configuration.jpg)
+
+To permanently save changed settings we borrow configuration variables from rules modul. You will have to restart tasmota or use sipset command.
+USE_RULES must be defined to borrow MEM1-MEM5 as config variables. To set enter MEMx value into web console. MEM will show current setting.
 
 - MEM1 dial_nr
 - MEM2 dial_user
