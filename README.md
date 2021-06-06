@@ -21,15 +21,16 @@ There are a limited number of commands you can enter into web console.
 - siptest	simulates door bell.
 - sipstate	shows current state. May also be changed if followed by integer value. Error states are greater than 1000 and do indicate line of error (substitude 1000).
 - sipset	option=value; without =value shows current option. Available options are:
--- dial_nr	number that will be called on door bell
--- dial_user shows up at handset if supported by handset
--- peer sip server
--- realm 	same as peer
--- myip 	get set on init
--- user 	fritzbox user. You should create one
--- pwd 		fritzbox user password
--- ipStr 	fritzbox ip
--- port 	fritzbox port. Default 5060
+
+- dial_nr	number that will be called on door bell
+- dial_user shows up at handset if supported by handset
+- peer sip server
+- realm 	same as peer
+- myip 	get set on init
+- user 	fritzbox user. You should create one
+- pwd 		fritzbox user password
+- ipStr 	fritzbox ip
+- port 	fritzbox port. Default 5060
 
 ## Configuration
 USE_RULES must be defined to borrow MEM1-MEM5 as config variables. To set enter MEM1 value into web console.
