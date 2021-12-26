@@ -15,6 +15,7 @@ param (
 	,$targetip = "192.168.178.1"
 	,$peerPort = 5060
 	,$nonce
+	,$cseq = 1
 	,[switch]$showdigest
 	,[switch]$test
 )
@@ -22,7 +23,6 @@ param (
 $tagid = get-random
 $branch = get-random
 $guid = new-guid
-$cseq = 1
 
 <# Example:
 SIP/2.0 401 Unauthorized

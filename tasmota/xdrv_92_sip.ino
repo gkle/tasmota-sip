@@ -78,7 +78,8 @@
 
 #define SIP_HUNG_UP_RING_TIME   8*1000              // milli seconds
 #define SIP_ERROR_TIMEOUT       60*1000             // reset error state after timeout
-#define ERROR_STATE             (1000 + __LINE__)   // location of runtime error. Try Command SipState
+#define SIP_ERROR_MIN           1000
+#define ERROR_STATE             (SIP_ERROR_MIN + __LINE__)   // location of runtime error. Try Command SipState
 
 typedef struct {
     char user[10] = SIP_FRITZBOX_USER;
@@ -112,9 +113,10 @@ typedef struct {
     int ringcount;
     unsigned int pkg_received;
     unsigned int loops;
-    uint32_t timer_errorstate;
+    bool timeout_started;
+    uint32_t timer_timeout;
     uint32_t timer_ringtime;
-#define MAXRINGHISTORY              8
+#define                 MAXRINGHISTORY  8
     int ringhistoryidx;  
     uint32_t ringhistory[MAXRINGHISTORY];
 } SIP_DATA;
@@ -221,8 +223,8 @@ void SipSendRequest(const char* request) {
     SipSendUdp(sip_outBuf);
 }
 
-void SipSendInvite() {
-    sipData.sip_state = SIP_STATE_INVITE;
+void SipSendInvite(int state = SIP_STATE_INVITE) {
+    sipData.sip_state = state;
     SipSendRequest("INVITE");
 }
 void SipSendBye() {
@@ -308,11 +310,7 @@ void SipParsePackage() {
         }
         // uri="sip:**613@fritz.box",
         snprintf(sipParam.uri, sizeof(sipParam.uri), "sip:%s@%s", sipParam.dial_nr, sipParam.realm);
-        SipSendInvite();
-        sipData.sip_state = SIP_STATE_INVITE_401;
-    } else if (SIP_STATE_INVITE_401 == sipData.sip_state && SIP_CODE_UNAUTHORIZED == sipData.sip_code) {
-        SipSendCancel();
-        sipData.sip_state = ERROR_STATE;
+        SipSendInvite(SIP_STATE_INVITE_401);
     }
  }
 
@@ -474,7 +472,6 @@ void (*const sip_cmnds[])(void) PROGMEM = {
 
 bool Xdrv92(uint8_t function) {
     bool result = false;
-    int received_sip_code;
 
     switch (function) {
         case FUNC_BUTTON_PRESSED:
@@ -487,17 +484,19 @@ bool Xdrv92(uint8_t function) {
             ++sipData.loops;
 
             if (WL_CONNECTED != Wifi.status) {
-                sipData.sip_state = ERROR_STATE; // No Wiffi
                 return false; // wait until wiffi is ready
             }
+            if (sipData.timeout_started && TimeReached(sipData.timer_timeout)) {
+                sipData.sip_state = SIP_STATE_INIT;     // Restart after timeout from error state.
+                sipData.timeout_started = false;
+            }
             if (SIP_CODE_INVALID <= sipData.sip_state) {
-                if (TimeReached(sipData.timer_errorstate))
-                    sipData.sip_state = SIP_STATE_INIT;     // Restart after timeout from error state.
+                if (!sipData.timeout_started) {
+                    SetNextTimeInterval(sipData.timer_timeout, SIP_ERROR_TIMEOUT);      
+                    sipData.timeout_started = true;
+                }
                 return false;
             }
-            SetNextTimeInterval(sipData.timer_errorstate, SIP_ERROR_TIMEOUT);      
-            SipReceiveUdp();    // Poll UDP receive buffer
-
             // action upon current state
             switch (sipData.sip_state) {
                 case SIP_STATE_INIT:
@@ -506,7 +505,13 @@ bool Xdrv92(uint8_t function) {
                     break;
                 case SIP_STATE_DO_RING:
                     ++sipParam.cseq;
-                    SetNextTimeInterval(sipData.timer_ringtime, SIP_HUNG_UP_RING_TIME);
+                    ++sipParam.callID;
+                    sipParam.nonce[0] = 0;
+                    sipParam.digest[0] = 0;
+                    sipParam.tag[0] = 0;
+                    SaveRingHistoryTime(); // once per ring
+                    SetNextTimeInterval(sipData.timer_timeout, SIP_ERROR_TIMEOUT);      
+                    sipData.timeout_started = true;
                     SipSendInvite();
                     break;
                 case SIP_STATE_RINGING:
@@ -514,37 +519,32 @@ bool Xdrv92(uint8_t function) {
                        SipSendCancel();
                     break;
                 case SIP_STATE_IDLE:
-                    sipParam.nonce[0] = 0;
-                    sipParam.digest[0] = 0;
-                    result = true;
-                    break;
+                case SIP_STATE_OK:
+                case SIP_STATE_CANCEL:
+                case SIP_STATE_INVITE_401: 
+                    break;      // do nothing while awaiting answer from UAS
             }
+            
+            SipReceiveUdp();    // Poll UDP receive buffer
             // UAS responses
-            received_sip_code = sipData.sip_code;
-            sipData.sip_code = SIP_CODE_LISTENING;
-            switch (received_sip_code) {
+            switch (sipData.sip_code) {
+                case SIP_CODE_REQUEST_CANCELLED:
                 case SIP_CODE_DECLINED:
-                    SipSendAck();
-                    break;
                 case SIP_CODE_OK:
-                    if (SIP_STATE_RINGING == sipData.sip_state) {
-                        SipSendBye();
-                    }
-                    if (SIP_STATE_CANCEL == sipData.sip_state) {
-                        SipSendAck();
-                    }
+                    SipSendAck();   // => state = ok
                     break;
-                case SIP_CODE_TRYING:
                 case SIP_CODE_RINGING:
-                case SIP_CODE_PROGRESS:
-                    if (sipData.sip_state != SIP_STATE_RINGING)
-                        SaveRingHistoryTime(); // once
+                case SIP_CODE_TRYING:
+                    SetNextTimeInterval(sipData.timer_ringtime, SIP_HUNG_UP_RING_TIME);
                     sipData.sip_state = SIP_STATE_RINGING;
+                    break;
+                case SIP_CODE_PROGRESS:
                     break;
                 case SIP_CODE_PARTY_HANGS_UP:
                     SipSendOk();
                     break;
             }
+            sipData.sip_code = SIP_CODE_LISTENING;
             break;
         case FUNC_JSON_APPEND:
             Sip_callhistory(1);
