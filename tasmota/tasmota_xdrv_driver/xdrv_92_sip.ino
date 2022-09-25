@@ -1,7 +1,7 @@
 /*
   xdrv_92_sip.ino - Fritzbox SIP client for Tasmota.
 
-  Copyright (C) 2021  Günther Klement
+  Copyright (C) 2022  Günther Klement Version 1.0.12.
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,18 +37,18 @@
 
 #include <TasmotaSerial.h>
 #include <inttypes.h>
-#include <tasmota.h>
+#include <include/tasmota.h>
 #include <WiFi.h>
 #include <WifiUdp.h>
 
-#define DIAL_NR                 "**613"             // **9 for all internal handsets
+#define DIAL_NR                 "**614"             // **9 for all internal handsets. Change with sipset dial_rn=**614 and mem1 **614
 #define DIAL_USER               "Haustür"           // Shows up as caller on phone
 #define LOCAL_IP                "192.168.178.17"    // will be set automatically at startup
 #define LOCAL_PORT              5060                // unlikely to be already used
 #define SIP_FRITZBOX_IP         "192.168.178.1"     // to test enter your dev machine's ip and run Packet Sender
 #define SIP_FRITZBOX_PORT       5060
 #define SIP_FRITZBOX_USER       "tklingel"          // registered as new LAN/WLAN fritzbox IP-telefon and setup user registration
-#define SIP_FRITZBOX_PASSWORD   "changeme"          // password configured on fritzbox. Use command mem4.
+#define SIP_FRITZBOX_PASSWORD   "changeme"          // password configured on fritzbox. Use command sipset pwd=1234 and mem4.
 #define PEERIP                  "fritz.box"         // also default 192.168.178.1 may be used
 #define SHOW_EXTRA_INFO_SEC     240                 // more info for x seconds after reset
 
@@ -152,7 +152,7 @@ void SipUdpListen() {
         return;
     }
     sipData.sip_state = ERROR_STATE;    // before connect
-    sipUdp.stopAll();
+    sipUdp.stop();
     sipConfig.ip.fromString(sipConfig.ipStr);
     if (!sipUdp.begin(sipParam.myPort)) {
         sipData.sip_state = ERROR_STATE;
@@ -208,7 +208,8 @@ void SipSendUdp(char* buf) {
         sipData.sip_state = ERROR_STATE;
         return;
     }
-    sipUdp.write(buf);
+    size_t len = strlen(buf);
+    sipUdp.write((const uint8_t*)buf, len);
     rc = sipUdp.endPacket();
     if (0 == rc)
         sipData.sip_state = ERROR_STATE;

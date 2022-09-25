@@ -4,12 +4,14 @@ This may be an external number, internal handset or \*\*9 for all internal hand 
 
 ## History
 - V1 First public version
+- 2022-10-25 Upgrade to Tasmota V12.1.1
 
 ## Installation
 You will have to compile tasmota to integrate the file xdrv_92_sip.ino
 First step is to clone tasmota from [github projectpage](https://github.com/arendst/tasmota/)
+Copy file xdrv_92_sip.ino into directory tasmota_xdrv_driver.
 
-In user_config_override.h ```#define USE_SIP```
+Create file user_config_override.h from user_config_override_sample.h adding ```#define USE_SIP``` and USE_RULES.
 
 ## Hardware
 PIR1 and BMP280 are optional. For U2 i have used a cheep step down converter. Also U3 opto coupler may also be replaced by handy one.
