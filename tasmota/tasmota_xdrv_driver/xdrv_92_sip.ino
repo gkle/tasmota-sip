@@ -41,7 +41,7 @@
 #include <WiFi.h>
 #include <WifiUdp.h>
 
-#define DIAL_NR                 "**614"             // **9 for all internal handsets. Change with sipset dial_rn=**614 and mem1 **614
+#define DIAL_NR                 "**614"             // **9 for all internal handsets. Change with sipset dial_nr=**614 and mem1 **614
 #define DIAL_USER               "Haustür"           // Shows up as caller on phone
 #define LOCAL_IP                "192.168.178.17"    // will be set automatically at startup
 #define LOCAL_PORT              5060                // unlikely to be already used
@@ -83,7 +83,7 @@
 
 typedef struct {
     char user[10] = SIP_FRITZBOX_USER;
-    char password[10] = SIP_FRITZBOX_PASSWORD;
+    char password[20] = SIP_FRITZBOX_PASSWORD;
     char ipStr[16] = SIP_FRITZBOX_IP;
     IPAddress ip;
     uint16_t port = SIP_FRITZBOX_PORT;

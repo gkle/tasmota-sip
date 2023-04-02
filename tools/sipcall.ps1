@@ -8,7 +8,7 @@ param (
 	[parameter(Mandatory=$true)]$password
 	,$realm = "fritz.box"
 	,$sipUser = "tklingel"
-	,$dialNr = "**613" # IP-Telefon 1 **620, **9 for all internal handsets
+	,$dialNr = "**614" # IP-Telefon 1 **620, **9 for all internal handsets
 	,$callid = "Doorbell"
 	,$siprequest = "INVITE"
 	,$myIP = "192.168.178.28" # ip of your PC
