@@ -25,13 +25,13 @@ There are a limited number of commands you can enter into web console.
 - sipset option=value	without =value shows current option. Available options are:
   - dial_nr	number that will be called on door bell
   - dial_user shows up at handset if supported by handset
-  - peer sip server
+  - peer 		sip server
   - realm 	same as peer
-  - myip 	get set on init
-  - user 	fritzbox user. You should create one
-  - pwd 		fritzbox user password
+  - myip 		get set on init
+  - user		Create new phone as LAN/WLAN (IP-Telefon), see "Anmeldedaten"
+  - pwd 		IP-Telefon password
   - ipStr 	fritzbox ip
-  - port 	fritzbox port. Default 5060
+  - port 		fritzbox port. Default 5060
 
 ## Configuration
 ![IO configuration](/images/configuration.jpg)
