@@ -1,7 +1,7 @@
 /*
   xdrv_92_sip.ino - Fritzbox SIP client for Tasmota.
 
-  Copyright (C) 2022  Günther Klement Version 1.0.12.
+  Copyright (C) 2023  Günther Klement Version 1.0.13.
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
