@@ -1,7 +1,7 @@
 /*
   xdrv_92_sip.ino - Fritzbox SIP client for Tasmota.
 
-  Copyright (C) 2023  Günther Klement Version 1.0.13.
+  Copyright (C) 2024  Günther Klement Version 1.0.14.
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -418,8 +418,8 @@ void Sip_cmd_state() {
     if (XdrvMailbox.data_len > 0) {
         int opt = strtol(XdrvMailbox.data,nullptr,10);
         sipData.sip_state = opt;
-        ResponseCmndDone();
     }
+    ResponseClear();
     Sip_callhistory(1);
 }
 
@@ -471,7 +471,7 @@ void (*const sip_cmnds[])(void) PROGMEM = {
     &Sip_cmd_state, &Sip_cmd_set, &Sip_cmd_test
 };    
 
-bool Xdrv92(uint8_t function) {
+bool Xdrv92(uint32_t function) {
     bool result = false;
 
     switch (function) {

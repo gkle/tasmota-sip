@@ -5,6 +5,7 @@ This may be an external number, internal handset or \*\*9 for all internal hand 
 ## History
 - V1 First public version
 - 2022-10-25 Upgrade to Tasmota V12.1.1
+- 2024-08-18 Upgrade to Tasmota V14
 
 ## Installation
 You will have to compile tasmota to integrate the file xdrv_92_sip.ino
